@@ -9,7 +9,7 @@ def loadPrg(name, loaded):
     with open(name, "r") as file:
         for l in file.readlines():
             line = l.lstrip().rstrip()
-            if line == "":
+            if line == "" or line[0] == "#":
                 continue
             elif line[0] == "@":
                 module = loadPrg(line[1:], loaded)

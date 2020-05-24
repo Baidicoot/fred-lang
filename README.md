@@ -10,3 +10,6 @@ fred> myprogram.fred
 
 ## Modules
 This implementation of Fred adds support for 'modules' - imported programs that add extra functionality to your program. To include a module, simply put `@module-file-path` in your program file.
+
+## Comments
+The definition loader will ignore all **lines** beginning with `#`.
