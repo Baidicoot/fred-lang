@@ -1,0 +1,18 @@
+swap: pair uncons
+unpair: uncons swap
+cons: swap pair
+
+rot3: pair pair reorder unpair uncons
+unrot3: rot3 rot3
+
+rot4: pair pair pair reorder unpair reorder unpair uncons
+unrot4: rot4 rot4 rot4
+
+rot5: pair pair pair pair reorder unpair reorder unpair reorder unpair uncons
+unrot5: rot5 rot5 rot5 rot5
+
+# useage: 'option-true 'option-false 'bool if
+if: call call
+
+#useage: 'option 'bool branch
+branch: 'unit swap if

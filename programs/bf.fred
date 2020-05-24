@@ -1,0 +1,15 @@
+@std.fred
+
+bf3_init: zero zero zero
+>: rot3
+<: unrot3
++: succ
+-: pred
+
+# (a b c 'loc) -> ('loc a b c), calling 'loc
+enter_loop: dup unrot5 call
+
+# useage: 'loop [
+[: unrot4 dup iszero not rot5 swap 'enter_loop swap 'drop swap if
+
+]: dup iszero not rot5 swap 'enter_loop swap 'drop swap if

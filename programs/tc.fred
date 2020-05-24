@@ -1,0 +1,11 @@
+@std.fred
+@bf.fred
+
+# N.B. here `[` is is used to 'enter' the loop who's symbol comes before it, and `]` is used to 'exit' the current loop.
+# For example, the `]` would come inside the loop's definition, but the `[` would come in the calling loop.
+# They operate the exact same as in BF
+
+loop_0: 'loop_1 [ ]
+loop_1: < + > - ]
+
+main: bf3_init + + 'loop_0 [

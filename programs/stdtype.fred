@@ -1,0 +1,17 @@
+@stdop.fred
+unit:
+
+true: drop
+false: swap drop
+
+not: 'false 'true rot3 call
+
+zero: 'unit 'true pair
+succ: 'false pair
+
+_constzero: drop zero
+_doublesucc: succ succ
+
+pred: unpair '_constzero swap 'unit swap if
+
+iszero: uncons drop
