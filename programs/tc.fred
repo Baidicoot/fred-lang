@@ -6,6 +6,6 @@
 # They operate the exact same as in BF
 
 loop_0: 'loop_1 [ ]
-loop_1: < + > - ]
+loop_1: <3 + >3 - ]
 
 main: bf3_init + + 'loop_0 [

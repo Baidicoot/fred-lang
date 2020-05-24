@@ -1,8 +1,8 @@
 @std.fred
 
 bf3_init: zero zero zero
->: rot3
-<: unrot3
+>3: rot3
+<3: unrot3
 +: succ
 -: pred
 
