@@ -1,3 +1,0 @@
-swap: pair uncons
-unpair: uncons swap
-main: 'a 'b 'c pair pair reorder unpair 'pair call
