@@ -42,3 +42,23 @@ def reorder(state):
     b = bc.fst
     c = bc.snd
     state.stack.append(eval.ProdType(b, eval.ProdType(a, c)))
+
+@eval.builtin("debug.dump")
+def dump(state):
+    for i in state.stack:
+        if hasattr(i, "log"):
+            print(i.log, end=" ")
+        else:
+            print(i.type, end=" ")
+    print("")
+
+@eval.builtin("debug.log")
+def log(state):
+    if hasattr(state.stack[-1], "log"):
+        print(state.stack[-1].log)
+    else:
+        print(state.stack[-1].type)
+
+@eval.builtin("debug.newline")
+def nl(state):
+    print("")

@@ -16,3 +16,6 @@ This implementation of Fred adds support for 'modules' - imported programs that 
 
 ## Comments
 The definition loader will ignore all **lines** beginning with `#`.
+
+## Debugging
+This implementation has two words (that do not affect the stack at all) for debugging. `debug.dump` prints the entire stack, while `debug.log` prints the top element.

@@ -1,0 +1,2 @@
+@std.fred
+main: zero succ succ succ zero succ succ add
