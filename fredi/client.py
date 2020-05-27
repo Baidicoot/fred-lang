@@ -1,12 +1,18 @@
 import eval
 import std
+from os import chdir, getcwd
+from os.path import dirname, basename
 
 def loadPrg(name, loaded):
+    old = getcwd()
     scope = {}
     if name in loaded:
         return scope
-    loaded.append(name)
+    loaded.append(basename(name))
     with open(name, "r") as file:
+        thisdir = dirname(name)
+        if thisdir != '':
+            chdir(thisdir)
         for l in file.readlines():
             line = l.lstrip().rstrip()
             if line == "" or line[0] == "#":
@@ -22,6 +28,7 @@ def loadPrg(name, loaded):
                 symbol = s.rstrip()
                 defn = d.lstrip().split()
                 scope[symbol] = defn
+    chdir(old)
     return scope
 
 def runFile(name):
