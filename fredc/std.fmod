@@ -1,0 +1,94 @@
+module-name:
+defines: end call drop dup pair uncons reorder
+declares: main
+requires: stdio string
+---------
+#define PUSH_LABEL(label) { \
+stack[stackptr] = (uint64_t)label; \
+stackptr++; \
+stack[stackptr] = 2; \
+stackptr++; \
+}
+
+#define SWAP(size0, size1) { \
+memmove(stack + stackptr, stack + stackptr - size0, size0 * sizeof(uint64_t)); \
+memmove(stack + stackptr - size1, stack + stackptr - size0 - size1, size1 * sizeof(uint64_t)); \
+memmove(stack + stackptr - size0 - size1, stack + stackptr, size0 * sizeof(uint64_t)); \
+}
+
+void call() {
+    stackptr -= 2;
+    void (*funptr)(void) = stack[stackptr];
+    funptr();
+}
+
+void drop() {
+    uint64_t n = stack[stackptr-1];
+    stackptr -= n;
+}
+
+void dup() {
+    size_t n = stack[stackptr-1];
+    memcpy(stack + stackptr, stack + stackptr - n, n * sizeof(uint64_t));
+    stackptr += n;
+}
+
+void pair() {
+    size_t size0 = stack[stackptr-1];
+    size_t size1 = stack[stackptr-size0-1];
+    stack[stackptr] = size0 + size1 + 1;
+    stackptr++;
+}
+
+#define UNPAIR { \
+stackptr--; \
+}
+
+void uncons() {
+    UNPAIR;
+    size_t size0 = stack[stackptr-1];
+    size_t size1 = stack[stackptr-size0-1];
+    SWAP(size0, size1);
+}
+
+void reorder() {
+    stackptr -= 2; /* fast unpair twice */
+    size_t size0 = stack[stackptr-1];
+    size_t size1 = stack[stackptr-size0-1];
+    size_t size2 = stack[stackptr-size0-size1-1];
+    memmove(stack + stackptr - size0 + size1, stack + stackptr - size0, size0 * sizeof(uint64_t)); /* move top element out of harm's way */
+    stackptr -= size0;
+    SWAP(size1, size2);
+    stackptr += size0;
+    memmove(stack + stackptr - size0, stack + stackptr - size0 + size1, size0 * sizeof(uint64_t)); /* move top element back into position */
+    pair();
+    pair();
+}
+
+void drop_print_stackitem() {
+    uint64_t s = stack[stackptr-1];
+    if (s == 2) {
+        for (int i = 0; i <= sizeof(labels)/(sizeof(labels[0]) * 2); i+=2) {
+            if (stack[stackptr-2] == labels[i]) {
+                printf("%s", labels[i+1]);
+                break;
+            }
+        }
+        drop();
+    } else {
+        UNPAIR;
+        printf("{");
+        drop_print_stackitem();
+        printf(" ");
+        drop_print_stackitem();
+        printf("} ");
+    }
+}
+
+void end() {
+    while (stackptr > 0) {
+        drop_print_stackitem();
+        printf(" ");
+    }
+    printf("\n");
+}

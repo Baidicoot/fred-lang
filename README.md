@@ -19,3 +19,11 @@ The definition loader will ignore all **lines** beginning with `#`.
 
 ## Debugging
 This implementation has two words (that do not affect the stack at all) for debugging. `debug.dump` prints the entire stack, while `debug.log` prints the top element.
+
+## Compilation
+To (very buggily) compile your Fred programs to C, compile fredc with cabal, and run `fredc <input-file> <output-file>` on your compile-friendly `.fred` file.
+
+A Fred project is 'compile-friendly' (this will probably change to become less restrictive in the future) if it:
+- has a flat file structure
+- references the `std.c` module (see [esolangs docs](https://esolangs.org/wiki/Fred))
+- finishes `main` with a call to `end` (this will output the stack in reverse order)

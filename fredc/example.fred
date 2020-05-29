@@ -1,0 +1,4 @@
+~std.c
+a:
+b:
+main: 'a 'b pair uncons end
