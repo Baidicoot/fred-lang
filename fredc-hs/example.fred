@@ -1,4 +1,4 @@
-~std.c
+~std.fmod
 a:
 b:
 main: 'a 'b pair uncons end
