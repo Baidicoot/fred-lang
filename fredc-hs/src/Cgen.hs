@@ -2,15 +2,7 @@ module Cgen where
 import Module
 import Parser
 import qualified Data.Map as Map
-import Data.List (nub, unzip5, (\\), intercalate)
-
-{-
-TODO:
-- handle module includes
-- handle function renaming
-- handle module blobs
-- handle call/definition generation
--}
+import Data.List (nub, unzip4, (\\), intercalate)
 
 getModules :: Files -> [Module]
 getModules (mods, _) = Map.elems mods
@@ -18,7 +10,7 @@ getModules (mods, _) = Map.elems mods
 genHeader :: [Module] -> String
 genHeader mods = concatMap (\i -> "#include <" ++ i ++ ".h>\n") included
     where
-        included = nub (concatMap (\(_, _, _, is, _) -> is) mods)
+        included = nub (concatMap (\(_, _, is, _) -> is) mods)
 
 enumerate :: [a] -> [(Int, a)]
 enumerate xs = arf 0 xs
@@ -27,10 +19,10 @@ enumerate xs = arf 0 xs
         arf _ [] = []
 
 getRequired :: [Module] -> [String]
-getRequired mods = let (_, _, _, r, _) = unzip5 mods in concat r
+getRequired mods = let (_, _, r, _) = unzip4 mods in concat r
 
 getDeclared :: [Module] -> [String]
-getDeclared mods = let (_, _, d, _, _) = unzip5 mods in concat d
+getDeclared mods = let (_, d, _, _) = unzip4 mods in concat d
 
 genRenamer :: Files -> Map.Map String String
 genRenamer (mods, pg) = let ex = concatMap Map.keys pg in
@@ -55,7 +47,7 @@ genStack :: String -> String -> Int -> String
 genStack stackName ptrName size = "uint64_t " ++ stackName ++ "[" ++ show size ++ "];\nuint64_t " ++ ptrName ++ ";\n"
 
 genBlobs :: [Module] -> String
-genBlobs mods = let (_, _, _, _, bs) = unzip5 mods in concat bs
+genBlobs mods = let (_, _, _, bs) = unzip4 mods in concat bs
 
 genDecl :: [String] -> String
 genDecl = concatMap (\s -> "void " ++ s ++ "();\n")
@@ -83,11 +75,11 @@ genBody namer label = concatMap (genIns label) . genFinalIns namer
 genFn :: Map.Map String String -> String -> String -> [Instruction] -> String
 genFn namer label name ins = "void " ++ name ++ "() {\n" ++ (genBody namer label ins) ++ "\n}\n"
 
-generate :: String -> Int -> String -> String -> String -> Files -> String
+generate :: String -> Int -> String -> String -> String -> Files -> String -- TODO: clean up
 generate stackName stackSize ptrName pushlabel tableName fs@(mods, progs) =
     let header = genHeader (getModules fs) ++ "#include <stdint.h>\n"
         namer = genRenamer fs
-        allIdentifiers = (concatMap (map Global . Map.keys) progs) ++ (concatMap (\(_, i, _, _, _) -> i) mods)
+        allIdentifiers = (concatMap (map Global . Map.keys) progs) ++ (concatMap (\(i, _, _, _) -> i) mods)
         printNames = map show allIdentifiers
         fnNames = map (rename namer) allIdentifiers
         table = genTable tableName (zip printNames fnNames)

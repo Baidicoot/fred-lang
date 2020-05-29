@@ -9,8 +9,8 @@ type Fred = ([String], [String], [(String, [Instruction])]) -- modules, imports,
 type Fmod = ([(String, [Identifier])], String)
 
 type Prog = (Map.Map String [Instruction])
-type Module = (String, [Identifier], [String], [String], String)
---              module name, implements, declares, requires, blob
+type Module = ([Identifier], [String], [String], String)
+--              module name, implements, declares, requires, blob -- TODO: change to greedily append module name
 
 getDefined :: Fred -> [String]
 getDefined (_, _, x) = let (y, _) = unzip x in y
@@ -63,35 +63,24 @@ unwrap (x:xs) = do
 makeModule :: Fmod -> Either String Module
 makeModule fmod@(f, blob) = case getDuplicateFields fmod of
     [] -> let fields = Map.fromList f in case do {
-        name'' <- "module-name" `Map.lookup` fields;
-        name' <- unwrap name'';
-        name <- (case name' of
-            [] -> Just ""
-            [x] -> Just x
-            _ -> Nothing);
         defines <- "defines" `Map.lookup` fields;
         declares' <- "declares" `Map.lookup` fields;
         declares <- unwrap declares';
         requires' <- "requires" `Map.lookup` fields;
         requires <- unwrap requires';
-        return (name, defines, declares, requires);
+        return (defines, declares, requires);
         } of
-            Just (name, defines, declares, requires) -> Right (name, defines, declares, requires, blob)
+            Just (defines, declares, requires) -> Right (defines, declares, requires, blob)
             Nothing -> Left "could not parse module file"
 
 includeModule :: Module -> String -> Files -> Either String Files
 includeModule mod name files@(mods, progs) = Right (Map.insert name mod mods, progs)
 
-appendModule :: String -> Identifier -> Identifier
-appendModule "" x = x
-appendModule m (Global x) = Module [m] x
-appendModule m (Module xs x) = Module (m:xs) x
-
 genModuleDefs :: Module -> [Identifier]
-genModuleDefs (n, i, _, _, _) = map (appendModule n) i
+genModuleDefs (x, _, _, _) = x
 
 genModuleReqs :: Module -> [String]
-genModuleReqs (_, _, x, _, _) = x
+genModuleReqs (_, x, _, _) = x
 
 type Files = (Map.Map String Module, Map.Map String Prog)
 type Request = ([String], [String])

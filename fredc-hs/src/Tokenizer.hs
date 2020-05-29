@@ -64,6 +64,7 @@ tokenizeModule s = arf [] s
     where
         arf toks s@(x:xs)
             | x == ':' = arf (Syntax ':':toks) xs
+            | x == '.' = arf (Syntax '.':toks) xs
             | x == '\n' = let (_, xs') = whitespace xs in
                 arf (Syntax '\n':toks) xs'
             | x == '-' = let (str, _) = ((while (== '-')) `before` rest) s in
