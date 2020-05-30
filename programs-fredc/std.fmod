@@ -1,4 +1,4 @@
-defines: end call drop dup pair uncons reorder print.dropStackitem
+defines: end call drop dup pair uncons reorder
 declares:
 requires: stdio string
 ---------

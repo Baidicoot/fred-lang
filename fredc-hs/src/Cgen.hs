@@ -28,14 +28,10 @@ genRenamer :: Files -> Map.Map String String
 genRenamer (mods, pg) = let ex = concatMap Map.keys pg in
     Map.fromList (map (\(i, v) -> (v, '_':show i)) (enumerate (ex \\ getDeclared (Map.elems mods))))
 
-genFnName :: [String] -> String -> String
-genFnName mods id = (intercalate "_" mods) ++ '_':id
-
 rename :: Map.Map String String -> Identifier -> String
-rename map (Global x) = case x `Map.lookup` map of
+rename map x = case x `Map.lookup` map of
     Just y -> y
-    Nothing -> x
-rename map (Module xs x) = genFnName xs x
+    Nothing -> fmap (\c -> if c == '.' then '_' else c) x
 
 genTable :: String -> [(String, String)] -> String
 genTable tableName names = arf ("uint64_t " ++ tableName ++ "[] = {") names
@@ -79,14 +75,14 @@ generate :: String -> Int -> String -> String -> String -> Files -> String -- TO
 generate stackName stackSize ptrName pushlabel tableName fs@(mods, progs) =
     let header = genHeader (getModules fs) ++ "#include <stdint.h>\n"
         namer = genRenamer fs
-        allIdentifiers = (concatMap (map Global . Map.keys) progs) ++ (concatMap (\(i, _, _, _) -> i) mods)
-        printNames = map show allIdentifiers
+        allIdentifiers = (concatMap Map.keys progs) ++ (concatMap (\(i, _, _, _) -> i) mods)
+        printNames = allIdentifiers
         fnNames = map (rename namer) allIdentifiers
         table = genTable tableName (zip printNames fnNames)
         stack = genStack stackName ptrName stackSize
         decls = genDecl fnNames
         blobs = genBlobs (Map.elems mods)
         allDefs = (concatMap Map.toList . Map.elems) progs
-        renamedDefs = map (\(n, is) -> (rename namer (Global n), is)) allDefs
+        renamedDefs = map (\(n, is) -> (rename namer n, is)) allDefs
         defns = concatMap (uncurry (genFn namer pushlabel)) renamedDefs in
             header ++ stack ++ decls ++ table ++ blobs ++ defns

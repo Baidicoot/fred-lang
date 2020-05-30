@@ -4,12 +4,8 @@ import Prelude hiding(or)
 import Data.Maybe (catMaybes)
 import Data.List (intercalate)
 
-data Identifier = Global String | Module [String] String deriving(Eq, Ord)
+type Identifier = String
 data Instruction = Call Identifier | Push Identifier deriving(Show, Eq, Ord)
-
-instance Show Identifier where
-    show (Global x) = x
-    show (Module xs x) = (intercalate "." xs) ++ '.':x
 
 type Parser a = [Token] -> Either String (a, [Token])
 
@@ -21,14 +17,7 @@ err :: [Token] -> String -> Either String a
 err xs name = Left ("unexpected " ++ (show (lookahead xs)) ++ " while parsing " ++ name)
 
 parseIdentifier :: Parser Identifier
-parseIdentifier (Ident x:xs) = case lookahead xs of
-    Syntax '.' -> mod [x] (tail xs)
-    _ -> Right (Global x, xs)
-    where
-        mod acc (Ident x:xs) = case lookahead xs of
-            Syntax '.' -> mod (x:acc) (tail xs)
-            _ -> Right (Module (reverse acc) x, xs)
-        mod acc xs = err xs "identifier"
+parseIdentifier (Ident x:xs) = Right (x, xs)
 parseIdentifier xs = err xs "identifier"
 
 parseIns :: Parser Instruction

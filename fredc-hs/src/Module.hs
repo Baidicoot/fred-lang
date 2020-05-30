@@ -30,7 +30,7 @@ getUtilized (_, _, x) = let (_, y) = unzip x in
     nub . concatMap (map unwrapIns) $ y
 
 getExternal :: Fred -> [Identifier]
-getExternal fred = filter (\e -> not (e `elem` (map Global (getDefined fred)))) (getUtilized fred)
+getExternal fred = filter (\e -> not (e `elem` (getDefined fred))) (getUtilized fred)
 
 makeProg :: Fred -> [Identifier] -> [String] -> Either String Prog
 makeProg fred@(_, _, defs) supplied required = case (getExternal fred \\ supplied) of
@@ -39,7 +39,7 @@ makeProg fred@(_, _, defs) supplied required = case (getExternal fred \\ supplie
         redef@(_:_) -> Left ("words " ++ intercalate ", " (map show redef) ++ " are internally redefined")
         [] -> case required \\ getDefined fred of
             req@(_:_) -> Left ("words " ++ intercalate ", " (map show req) ++ " need to be defined")
-            [] -> case nub (intersect (map Global (getExported fred)) supplied) of
+            [] -> case nub (intersect (getExported fred) supplied) of
                 redef@(_:_) -> Left ("words " ++ intercalate ", " (map (show . show) redef) ++ " are redefinitions of external functions")
                 [] -> Right (Map.fromList defs)
 
@@ -49,25 +49,12 @@ getFields (x, _) = let (y, _) = unzip x in y
 getDuplicateFields :: Fmod -> [String]
 getDuplicateFields fmod = nub (getFields fmod \\ nub (getFields fmod))
 
-attemptUnwrap :: Identifier -> Maybe String
-attemptUnwrap (Global x) = Just x
-attemptUnwrap _ = Nothing
-
-unwrap :: [Identifier] -> Maybe [String]
-unwrap [] = Just []
-unwrap (x:xs) = do
-    s <- attemptUnwrap x
-    ss <- unwrap xs
-    return (s:ss)
-
 makeModule :: Fmod -> Either String Module
 makeModule fmod@(f, blob) = case getDuplicateFields fmod of
     [] -> let fields = Map.fromList f in case do {
         defines <- "defines" `Map.lookup` fields;
-        declares' <- "declares" `Map.lookup` fields;
-        declares <- unwrap declares';
-        requires' <- "requires" `Map.lookup` fields;
-        requires <- unwrap requires';
+        declares <- "declares" `Map.lookup` fields;
+        requires <- "requires" `Map.lookup` fields;
         return (defines, declares, requires);
         } of
             Just (defines, declares, requires) -> Right (defines, declares, requires, blob)
@@ -103,7 +90,7 @@ loadWith fred@(modules, imports, _) (loadedMod, loadedProg) =
         (Left xs, _) -> Right (Left (xs, []))
         (_, Left xs) -> Right (Left ([], xs))
         (Right xs, Right ys) ->
-            let supplied = concatMap genModuleDefs xs ++ concatMap (map Global . Map.keys) ys
+            let supplied = concatMap genModuleDefs xs ++ concatMap Map.keys ys
                 required = concatMap genModuleReqs xs in
                     case makeProg fred supplied required of
                         Left err -> Left err

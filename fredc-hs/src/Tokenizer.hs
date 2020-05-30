@@ -46,9 +46,9 @@ tokenize s = arf [] s
                 arf (Builtin file:toks) rem
             | x == '\'' = arf (Syntax '\'':toks) xs
             | x == ':' = arf (Syntax ':':toks) xs
+            | x == '.' = arf (Syntax '.':toks) xs
             | x == '\n' = let (_, xs') = whitespace xs in
                 arf (Syntax '\n':toks) xs'
-            | x == '.' = arf (Syntax '.':toks) xs
             | isSpace x = arf toks xs
             | otherwise = let (id, rem) = ident s in
                 arf (Ident id:toks) rem
