@@ -1,0 +1,23 @@
+~std.fmod
+swap: pair uncons
+unpair: uncons swap
+cons: swap pair
+rot3: pair pair reorder unpair uncons
+unrot3: rot3 rot3
+rot4: pair pair pair reorder unpair reorder unpair uncons
+unrot4: rot4 rot4 rot4
+rot5: pair pair pair pair reorder unpair reorder unpair reorder unpair uncons
+unrot5: rot5 rot5 rot5 rot5
+if: call call
+branch: 'unit swap if
+unit:
+true: drop
+false: swap drop
+not: 'false 'true rot3 call
+zero: 'unit 'true pair
+succ: 'false pair
+_constzero: drop zero
+pred: unpair '_constzero swap 'unit swap if
+iszero: uncons drop
+add_internal: swap succ swap pred dup iszero not 'add_internal swap branch
+add: dup iszero not 'add_internal swap branch drop
