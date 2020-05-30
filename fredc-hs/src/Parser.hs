@@ -4,6 +4,8 @@ import Prelude hiding(or)
 import Data.Maybe (catMaybes)
 import Data.List (intercalate)
 
+{- PARSE the tokenstream into pesudo-AST -}
+
 type Identifier = String
 data Instruction = Call Identifier | Push Identifier deriving(Show, Eq, Ord)
 
@@ -81,6 +83,7 @@ parseBlob :: Parser String
 parseBlob (Syntax '-':Blob s:[]) = Right (s, [])
 parseBlob xs = err xs "blob"
 
+-- fred ::= *((<import> / <include> / <definition>) '\n')
 fred :: Parser [(Maybe String, Maybe String, Maybe (String, [Instruction]))]
 fred = (mod `or` imp `or` defn) `sepBy` (syntax '\n')
     where
@@ -105,6 +108,7 @@ parseFred s = do
             Right (catMaybes modules, catMaybes imports, catMaybes definitions)
         _ -> err xs ".fred file"
 
+-- fmod ::= *definition 1*'-' <blob>
 parseFmod :: [Token] -> Either String ([(String, [Identifier])], String)
 parseFmod s = do
     (x, xs) <- fmod s

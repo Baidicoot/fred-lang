@@ -2,6 +2,8 @@ module Tokenizer (tokens, tokensModule, Token(..)) where
 import Data.Char
 import Prelude hiding(until)
 
+{- TOKENIZES the input stream for parsing -}
+
 data Token = Import String | Builtin String | Syntax Char | Ident String | Blob String | TokEnd deriving(Show, Eq)
 
 type Lexer a = String -> (a, String)
@@ -36,10 +38,11 @@ ident = until (\c -> isSpace c || c `elem` ":.'")
 whitespace :: Lexer String
 whitespace = while isSpace
 
+-- lexer for .fred files, maybe
 tokenize :: Lexer [Token]
 tokenize s = arf [] s
     where
-        arf toks s@(x:xs)
+        arf toks s@(x:xs) {- generally filter out special characters -}
             | x == '@' = let (file, rem) = until isSpace xs in
                 arf (Import file:toks) rem
             | x == '~' = let (file, rem) = until isSpace xs in
