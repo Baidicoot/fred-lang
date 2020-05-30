@@ -1,5 +1,4 @@
 ~main.fmod
-~std.fmod
 @std.fred
 
 main: zero succ succ succ zero succ succ add end
