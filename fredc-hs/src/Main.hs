@@ -27,7 +27,8 @@ loadManyMods fs [] = return (Right fs)
 
 includeFred :: Files -> String -> IO (Either String Files) {- this is fucking unreadable -}
 includeFred fs@(mods, progs) addr = do
-    str <- readFile addr
+    s <- readFile addr
+    let str = "~std.fmod\n" ++ s
     let fred = do {
         t <- tokens str;
         p <- parseFred t;

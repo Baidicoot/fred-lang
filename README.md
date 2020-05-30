@@ -26,5 +26,6 @@ To compile your Fred programs to C, compile fredc with cabal, and run `fredc <in
 A Fred project is 'compile-friendly' (this will probably change to become less restrictive in the future) if it:
 - does not include any words containing `.`
 - has a flat file structure
-- references the `std.fmod` module (see [esolangs docs](https://esolangs.org/wiki/Fred) or `example.fred`)
+- has `std.fmod` in the same folder as it
+- `main` includes the `main.fmod` module
 - finishes `main` with a call to `end` (this will output the stack in reverse order)
