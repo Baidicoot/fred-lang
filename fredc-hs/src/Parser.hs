@@ -85,7 +85,7 @@ parseBlob xs = err xs "blob"
 
 -- fred ::= *((<import> / <include> / <definition>) '\n')
 fred :: Parser [(Maybe String, Maybe String, Maybe (String, [Instruction]))]
-fred = (mod `or` imp `or` defn) `sepBy` (syntax '\n')
+fred = (mod `or` imp `or` defn) `sepBy` (many $ syntax '\n')
     where
         mod s = case parseModule s of
             Right (x, xs) -> Right ((Just x, Nothing, Nothing), xs)
@@ -100,17 +100,17 @@ fred = (mod `or` imp `or` defn) `sepBy` (syntax '\n')
 fmod :: Parser [(String, [Identifier])]
 fmod = parseField `sepBy` (syntax '\n')
 
-parseFred :: [Token] -> Either String ([String], [String], [(String, [Instruction])])
-parseFred s = do
+parseFred :: String -> [Token] -> Either String ([String], [String], [(String, [Instruction])])
+parseFred name s = do
     (x, xs) <- fred s
     case xs of
         [] -> let (modules, imports, definitions) = unzip3 x in
             Right (catMaybes modules, catMaybes imports, catMaybes definitions)
-        _ -> err xs ".fred file"
+        _ -> err xs name
 
 -- fmod ::= *definition 1*'-' <blob>
-parseFmod :: [Token] -> Either String ([(String, [Identifier])], String)
-parseFmod s = do
+parseFmod :: String -> [Token] -> Either String ([(String, [Identifier])], String)
+parseFmod name s = do
     (x, xs) <- fmod s
     (_, xss) <- many (syntax '\n') xs
     (blob, _) <- parseBlob xss

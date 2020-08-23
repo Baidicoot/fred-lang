@@ -80,7 +80,7 @@ void print_dropStackitem() {
         print_dropStackitem();
         printf(" ");
         print_dropStackitem();
-        printf("} ");
+        printf("}");
     }
 }
 

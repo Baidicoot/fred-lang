@@ -35,6 +35,9 @@ before a b str = let (_, rem) = a str in b rem
 ident :: Lexer String
 ident = until (\c -> isSpace c || c `elem` ":.'")
 
+comment :: Lexer String
+comment = until (=='\n')
+
 whitespace :: Lexer String
 whitespace = while isSpace
 
@@ -43,6 +46,7 @@ tokenize :: Lexer [Token]
 tokenize s = arf [] s
     where
         arf toks s@(x:xs) {- generally filter out special characters -}
+            | x == '#' = let (_, rem) = comment xs in arf toks rem
             | x == '@' = let (file, rem) = until isSpace xs in
                 arf (Import file:toks) rem
             | x == '~' = let (file, rem) = until isSpace xs in

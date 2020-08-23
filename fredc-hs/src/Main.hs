@@ -13,7 +13,7 @@ loadMod fs addr = do
     str <- readFile addr
     return $ do
         t <- tokensModule str
-        p <- parseFmod t
+        p <- parseFmod addr t
         m <- makeModule p
         includeModule m addr fs
 
@@ -31,7 +31,7 @@ includeFred fs@(mods, progs) addr = do
     let str = "~std.fmod\n" ++ s
     let fred = do {
         t <- tokens str;
-        p <- parseFred t;
+        p <- parseFred addr t;
         loadWith p fs;
     }
     case fred of
