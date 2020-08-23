@@ -1,4 +1,4 @@
-defines: end call drop dup pair uncons reorder
+defines: end call drop dup pair uncons reorder println
 declares:
 requires: stdio string
 ---------
@@ -82,6 +82,12 @@ void print_dropStackitem() {
         print_dropStackitem();
         printf("}");
     }
+}
+
+void println() {
+    dup();
+    print_dropStackitem();
+    printf("\n");
 }
 
 void end() {

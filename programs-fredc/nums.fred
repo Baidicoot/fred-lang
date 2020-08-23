@@ -1,0 +1,28 @@
+@std.fred
+
+0: zero
+1: succ 0
+2: succ 1
+3: succ 2
+4: succ 3
+5: succ 4
+6: succ 5
+7: succ 6
+8: succ 7
+9: succ 8
+10: succ 9
+11: succ 10
+12: succ 11
+13: succ 12
+14: succ 13
+15: succ 14
+16: succ 15
+17: succ 16
+18: succ 17
+19: succ 18
+20: succ 19
+21: succ 20
+22: succ 21
+23: succ 22
+24: succ 23
+25: succ 24

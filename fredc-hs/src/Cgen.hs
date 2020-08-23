@@ -34,25 +34,25 @@ rename map x = case x `Map.lookup` map of
     Nothing -> fmap (\c -> if c == '.' then '_' else c) x
 
 genTable :: String -> [(String, String)] -> String
-genTable tableName names = arf ("uint64_t " ++ tableName ++ "[] = {") names
+genTable tableName names = arf ("void* " ++ tableName ++ "[] = {") names
     where
         arf acc ((old, new):xs) = arf (acc ++ new ++ ",\"" ++ old ++ "\",") xs
         arf acc [] = acc ++ "};\n"
 
 genStack :: String -> String -> Int -> String
-genStack stackName ptrName size = "uint64_t " ++ stackName ++ "[" ++ show size ++ "];\nuint64_t " ++ ptrName ++ ";\n"
+genStack stackName ptrName size = "int64_t* " ++ stackName ++ "[" ++ show size ++ "];\nuint64_t " ++ ptrName ++ ";\n"
 
 genBlobs :: [Module] -> String
 genBlobs mods = let (_, _, _, bs) = unzip4 mods in concat bs
 
 genDecl :: [String] -> String
-genDecl = concatMap (\s -> "void " ++ s ++ "();\n")
+genDecl = (++"\n") . concatMap (\s -> "void " ++ s ++ "();")
 
 genCall :: String -> String
-genCall str = str ++ "();\n"
+genCall str = str ++ "();"
 
 genPush :: String -> String -> String
-genPush fn label = fn ++ "(" ++ label ++ ");\n"
+genPush fn label = fn ++ "(" ++ label ++ ");"
 
 data FinalIns = CallIns String | PushIns String
 
@@ -69,7 +69,7 @@ genBody :: Map.Map String String -> String -> [Instruction] -> String
 genBody namer label = concatMap (genIns label) . genFinalIns namer
 
 genFn :: Map.Map String String -> String -> String -> [Instruction] -> String
-genFn namer label name ins = "void " ++ name ++ "() {\n" ++ (genBody namer label ins) ++ "\n}\n"
+genFn namer label name ins = "\nvoid " ++ name ++ "() {" ++ (genBody namer label ins) ++ "}"
 
 generate :: String -> Int -> String -> String -> String -> Files -> String -- TODO: clean up
 generate stackName stackSize ptrName pushlabel tableName fs@(mods, progs) =
