@@ -85,6 +85,6 @@ rec_list: pair swap dup isnil 'case_nil 'case_cons ifr
 ++_rec_nil:
 
 # bs as a -> {(as ++ bs) a}
-++_rec_cons: unrot3 swap ++ swap ;
+++_rec_cons: unrot3 ++ swap ;
 
-++: swap '++_rec_cons '++_rec_nil rec_list
+++: '++_rec_cons '++_rec_nil rec_list
