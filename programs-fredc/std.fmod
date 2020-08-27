@@ -1,7 +1,8 @@
-defines: end call drop dup pair uncons reorder println
-declares:
+defines: start end call drop dup pair uncons reorder println ascii
+declares: true
 requires: stdio string
 ---------
+
 #define PUSH_LABEL(label) { \
 stack[stackptr] = (uint64_t)label; \
 stackptr++; \
@@ -64,12 +65,44 @@ void reorder() {
     pair();
 }
 
+void (*getLabel(char* name))(void) {
+    for (int i = 0; i < sizeof(labels)/sizeof(labels[0]); i++) {
+        if (strcmp(name, labels[i].label) == 0) {
+            printf("found: %s, at: %x\n", labels[i].label, labels[i].fn);
+            return labels[i].fn;
+        }
+    }
+}
+
+//void (*trueFn)(void);
+void start() {
+    //trueFn = getLabel("true");
+}
+
+int countNat() {
+    int c = 0;
+    UNPAIR;
+    while (stack[stackptr-2] != true) {
+        drop();
+        UNPAIR;
+        c++;
+    }
+    drop();
+    drop();
+    return c;
+}
+
+void ascii() {
+    int c = countNat();
+    putchar(c);
+}
+
 void print_dropStackitem() {
     uint64_t s = stack[stackptr-1];
     if (s == 2) {
-        for (int i = 0; i < sizeof(labels)/sizeof(labels[0]); i+=2) {
-            if (stack[stackptr-2] == labels[i]) {
-                printf("%s", labels[i+1]);
+        for (int i = 0; i < sizeof(labels)/sizeof(labels[0]); i++) {
+            if (stack[stackptr-2] == labels[i].fn) {
+                printf("%s", labels[i].label);
                 break;
             }
         }

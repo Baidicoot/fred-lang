@@ -1,0 +1,32 @@
+@std.fred
+
+zero: () 'true pair
+# x -> (x + 1)
+succ: 'false pair
+# a -> 0
+_constzero: drop zero
+# x -> (x - 1)
+pred: unpair '_constzero swap 'unit swap if
+
+# 0 -> true
+# 1 -> false
+iszero: uncons drop
+
+# {f0 f1} Zero -> f0()
+case_zero: drop unpair drop call
+
+# {f0 f1} (Succ x) -> x f1()
+case_succ: pred swap unpair swap drop call
+
+# Zero f0 f1 -> f0()
+# (Succ x) f0 f1 -> x f1()
+rec_nat: pair swap dup iszero 'case_zero 'case_succ ifr
+
+add_internal: swap succ swap pred dup iszero not 'add_internal swap branch
+# a b -> (a + b)
++: dup iszero not 'add_internal swap branch drop
+
+*_case_zero: _constzero
+# a x -> a b a * +
+*_case_succ: swap dup rot3 * +
+*: '*_case_zero '*_case_succ rec_nat

@@ -1,0 +1,30 @@
+# nil list - {() true}
+nil: () 'true pair
+
+# xs x -> {{xs x} false}
+;: pair 'false pair
+
+# {{xs x} false} -> xs x
+un;: unpair drop unpair
+
+# nil -> true
+# {{xs x} false} -> false
+isnil: unpair swap drop
+
+# {fn1 fn2} {{xs x} false} -> xs x fn1()
+case_cons: un; rot3 unpair drop call
+
+# {fn1 fn2} nil -> fn2()
+case_nil: drop unpair swap drop call
+
+# rec_list: {{xs x} false} fn1 _ -> xs x fn1()
+# rec_list: nil _ fn2 -> fn2()
+rec_list: pair swap dup isnil 'case_nil 'case_cons ifr
+
+# bs -> bs
+++_rec_nil:
+
+# bs as a -> {(as ++ bs) a}
+++_rec_cons: unrot3 ++ swap ;
+
+++: '++_rec_cons '++_rec_nil rec_list

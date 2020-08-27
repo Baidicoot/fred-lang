@@ -1,0 +1,46 @@
+~main.fmod
+A: pair
+B: uncons
+C: reorder
+D: call
+E: drop
+F: dup
+G: ascii
+H: A B
+I: B H
+J: A A C I B
+K: D D
+L: J K
+M: 'O H K
+O:
+true: E
+Q: H E
+R: 'Q 'true J D
+S: 'O 'true A
+T: 'Q A
+U: E S
+V: I 'U H 'O H K
+W: B E
+X: E I E D
+Y: V H I H E D
+Z: A H F W 'X 'Y L
+a: H T H V F W R 'a H M
++: F W R 'a H M E
+b: U
+c: H F J * +
+*: 'b 'c Z
+5: S T T T T T
+3: S T T T
+2: S T T
+10: 5 2 *
+20: 10 2 *
+100: 5 5 * 2 * 2 *
+72: 20 3 * 10 + 2 +
+108: 100 2 2 * 2 * +
+111: 108 3 +
+114: 111 3 +
+44: 20 2 * 2 2 * +
+32: 20 10 + 2 +
+87: 72 10 + 5 +
+33: 32 T
+main: start 72 G 100 T G 108 G 108 G 111 G 44 G 32 G 87 G 111 G 114 G 108 G 100 G 33 G end

@@ -1,8 +1,6 @@
 ~main.fmod
 @std.fred
 @nums.fred
+@nat.fred
 
-# nil '3 ; '4 ; nil '5 ; '6 ; '7 ; ++ -> {false {4 {false {3 {false {7 {false {6 {false {5 {true ()}}}}}}}}}}}
-# nil '3 ; '4 ; nil '5 ; '6 ; '7 ; -> {false {7 {false {6 {false {5 {true ()}}}}}}} {false {4 {false {3 {true ()}}}}}
-
-main: nil '3 ; '4 ; nil '5 ; '6 ; '7 ; println ++ end
+main: start 18 4 * ascii 21 5 * ascii 11 3 * ascii end

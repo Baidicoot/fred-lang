@@ -7,6 +7,13 @@ import Data.List (nub, unzip4, (\\), intercalate)
 getModules :: Files -> [Module]
 getModules (mods, _) = Map.elems mods
 
+labeledPtr :: String
+labeledPtr = unlines
+    ["struct LabelPtr {"
+    ,"   void (*fn)(void);"
+    ,"   char* label;"
+    ,"};"]
+
 genHeader :: [Module] -> String
 genHeader mods = concatMap (\i -> "#include <" ++ i ++ ".h>\n") included
     where
@@ -34,10 +41,9 @@ rename map x = case x `Map.lookup` map of
     Nothing -> fmap (\c -> if c == '.' then '_' else c) x
 
 genTable :: String -> [(String, String)] -> String
-genTable tableName names = arf ("void* " ++ tableName ++ "[] = {") names
+genTable tableName names = "struct LabelPtr " ++ tableName ++ "[] = {" ++ arf names ++ "};"
     where
-        arf acc ((old, new):xs) = arf (acc ++ new ++ ",\"" ++ old ++ "\",") xs
-        arf acc [] = acc ++ "};\n"
+        arf xs = intercalate "," (fmap (\(old, new) -> "{" ++ new ++ ",\"" ++ old ++ "\"}") xs)
 
 genStack :: String -> String -> Int -> String
 genStack stackName ptrName size = "int64_t* " ++ stackName ++ "[" ++ show size ++ "];\nuint64_t " ++ ptrName ++ ";\n"
@@ -85,4 +91,4 @@ generate stackName stackSize ptrName pushlabel tableName fs@(mods, progs) =
         allDefs = (concatMap Map.toList . Map.elems) progs
         renamedDefs = map (\(n, is) -> (rename namer n, is)) allDefs
         defns = concatMap (uncurry (genFn namer pushlabel)) renamedDefs in
-            header ++ stack ++ decls ++ table ++ blobs ++ defns
+            header ++ stack ++ decls ++ labeledPtr ++ table ++ blobs ++ defns
